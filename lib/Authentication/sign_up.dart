@@ -1,33 +1,29 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:sample/Authentication/login_form.dart';
 import 'package:sample/Providers/dio_prov.dart';
-import 'package:sample/main.dart';
-import 'package:sample/models/auth_model.dart';
-import '../Dimensions/dimensions.dart';
-import '../Widgets/button.dart';
-import '../screens/home_screen.dart';
 
-class LoginScreen extends StatefulWidget {
+import '../Dimensions/dimensions.dart';
+import '../main.dart';
+import '../models/auth_model.dart';
+import '../Widgets/button.dart';
+import 'auth_page.dart';
+
+class SignUp extends StatefulWidget {
+  const SignUp({Key? key}) : super(key: key);
+
   @override
-  _LoginScreenState createState() => _LoginScreenState();
+  State<SignUp> createState() => _SignUpState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _SignUpState extends State<SignUp> {
+  TextEditingController _nameController = TextEditingController();
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool _isObscure=true;
-  bool _isLoading = false;
-
-
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Material(
@@ -36,6 +32,19 @@ class _LoginScreenState extends State<LoginScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            TextFormField(
+              controller: _nameController,
+              keyboardType: TextInputType.text,
+              decoration: InputDecoration(
+                hintText: "Enter Name",
+                labelText: "Name",
+                alignLabelWithHint: true,
+                prefixIcon: Icon(Icons.person_outlined),
+                prefixIconColor: Dimensions.primarycolor,
+
+              ),
+            ),
+            Dimensions.spacesmall,
             TextFormField(
               controller: _emailController,
               keyboardType: TextInputType.emailAddress,
@@ -74,22 +83,34 @@ class _LoginScreenState extends State<LoginScreen> {
             SizedBox(
               height: 10,
             ),
-               Consumer<AuthModel>(
-                 builder: (context, auth, child){
-                   return Button(
-                     onPressed: () async {
-                       final token=await DioProvider().login(_emailController.text, _passwordController.text,);
-                       print(token);
-                        if(token){
-                          auth.loginSuccess();
-                          MyApp.navigatorkey.currentState!.pushNamed('main');
-                        }
-                     },
-                     title: 'Sign In',
-                     width: double.maxFinite,
-                     disable: false,);
-                 }
-               )
+            Consumer<AuthModel>(
+            builder: (context, auth, child){
+              return Button(
+                onPressed: () async {
+                  final userRegistration=await DioProvider().register(
+                      _nameController.text,
+                    _emailController.text,
+                    _passwordController.text,);
+                  //print(userRegistration);
+                  if (!(userRegistration is DioError)){
+                    final token=await DioProvider().login(_emailController.text, _passwordController.text,);
+                    if(token){
+                      auth.loginSuccess();
+                      MyApp.navigatorkey.currentState!.pushNamed('/');
+                    }
+                  }else{
+                    print("register not succesfull");
+                  }
+
+                },
+
+                title: 'Sign Up',
+                width: double.maxFinite,
+                disable: false,);
+            }
+
+            )
+
 
           ],
         ),

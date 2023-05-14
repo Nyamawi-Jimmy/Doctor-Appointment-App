@@ -1,5 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:sample/Providers/dio_prov.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Dimensions/dimensions.dart';
 
@@ -12,40 +16,51 @@ class AppointmentPage extends StatefulWidget {
 
 enum FilterStatus { upcoming, complete, cancel }
 
-List<dynamic> schedules = [
-  {
-    "doctor_name": "Dr Jimmy Nyamawi",
-    "doctor_profile": "assets/images/jimmy.JPG",
-    "category": "Dental",
-    "status": FilterStatus.upcoming
-  },
-  {
-    "doctor_name": "Dr Erick Wanjohi",
-    "doctor_profile": "assets/images/jimmy.JPG",
-    "category": "Cardiology",
-    "status": FilterStatus.complete
-  },
-  {
-    "doctor_name": "Dr Morris Wanjohi",
-    "doctor_profile": "assets/images/jimmy.JPG",
-    "category": "Respirations",
-    "status": FilterStatus.complete
-  },
-  {
-    "doctor_name": "Dr Carlos Daff",
-    "doctor_profile": "assets/images/jimmy.JPG",
-    "category": "Dermatology",
-    "status": FilterStatus.cancel
-  }
-];
 
 class _AppointmentPageState extends State<AppointmentPage> {
   FilterStatus status = FilterStatus.upcoming;
   Alignment _alignment = Alignment.centerLeft;
-  List<dynamic> filteredSchedules = schedules.where((schedule) => schedule["status"] == FilterStatus.upcoming).toList();
+  List<dynamic> schedules = [];
+
+  Future <void> getAppointments() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token') ?? '';
+    print(token);
+    final appointment=await DioProvider().getAppointment(token);
+    print('yeeeii');
+    if(appointment!='error'){
+      print('yeeeii');
+      setState((){
+        schedules=json.decode(appointment);
+        print(schedules);
+      });
+    }else{
+      print('noooo');
+
+    }
+  }
+
+  @override
+  void initState(){
+    getAppointments();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
+    List<dynamic> filteredSchedules = schedules.where((var schedule) {
+          switch (schedule['status']){
+            case 'upcoming':
+              schedule['status']=FilterStatus.upcoming;
+                  break;
+            case 'complete':
+              schedule['status']=FilterStatus.complete;
+              break;
+            case 'cancel':
+              schedule['status']=FilterStatus.cancel;
+              break;
+          }
+        return schedule["status"] == status;}).toList();
     return SafeArea(
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 15,vertical: 15),
@@ -130,7 +145,7 @@ class _AppointmentPageState extends State<AppointmentPage> {
                   child: ListView.builder(
                     itemCount: filteredSchedules.length,
                     itemBuilder: (context,index){
-                      var _schedule=filteredSchedules[index];
+                      var schedule=filteredSchedules[index];
                       bool isLastElement=filteredSchedules.length +1 ==index;
                       return Card(
                         shape: RoundedRectangleBorder(
@@ -149,7 +164,7 @@ class _AppointmentPageState extends State<AppointmentPage> {
                                   children: [
                                     CircleAvatar(
                                       backgroundImage: AssetImage(
-                                        _schedule["doctor_profile"]
+                                       'assets/images/jimmy.JPG'
                                       ),
                                     ),
                                     SizedBox(width: 10,),
@@ -157,7 +172,7 @@ class _AppointmentPageState extends State<AppointmentPage> {
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          _schedule["doctor_name"],
+                                          schedule["doctor_name"],
                                           style: TextStyle(
                                             fontSize: 16,
                                             fontWeight: FontWeight.w700,
@@ -166,7 +181,7 @@ class _AppointmentPageState extends State<AppointmentPage> {
                                         ),
                                         SizedBox(height: 5,),
                                         Text(
-                                          _schedule["category"],
+                                          schedule["category"],
                                           style: TextStyle(
                                             fontSize: 15,
                                             fontWeight: FontWeight.w500,
@@ -178,7 +193,11 @@ class _AppointmentPageState extends State<AppointmentPage> {
                                   ],
                                 ),
                               SizedBox(height: 5,),
-                              ScheduleWidget(),
+                              ScheduleWidget(
+                                date: schedule['date'],
+                                day: schedule['day'],
+                                time: schedule['time'],
+                              ),
                               SizedBox(height: 5,),
                               Row(
                                 children: [
@@ -210,7 +229,11 @@ class _AppointmentPageState extends State<AppointmentPage> {
 }
 
 class ScheduleWidget extends StatelessWidget {
-  const ScheduleWidget({Key? key}) : super(key: key);
+  const ScheduleWidget({Key? key, required this.date, required this.day, required this.time}) : super(key: key);
+  final String date;
+  final String day;
+  final String time;
+
 
   @override
   Widget build(BuildContext context) {
@@ -229,7 +252,7 @@ class ScheduleWidget extends StatelessWidget {
           SizedBox(width: 20,),
           Icon(Icons.calendar_today,color: Dimensions.primarycolor,size: 15,),
           SizedBox(width: 5,),
-          Text("Monday 21/04/2023",
+          Text('$day,$date',
             style: TextStyle(
                 color:  Dimensions.primarycolor
             ),),
@@ -237,7 +260,7 @@ class ScheduleWidget extends StatelessWidget {
           Icon(Icons.access_alarm,color: Dimensions.primarycolor,size: 17,),
           SizedBox(width: 5,),
           Flexible(
-            child: Text("2:00 PM",
+            child: Text("$time",
               style: TextStyle(
                  color: Dimensions.primarycolor
               ),),

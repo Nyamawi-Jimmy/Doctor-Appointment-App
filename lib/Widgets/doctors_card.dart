@@ -2,11 +2,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../Dimensions/dimensions.dart';
-
 class DoctorsCard extends StatelessWidget {
   final String route;
+  final Map <String,dynamic>doctor;
   const DoctorsCard({Key? key,
-    required this.route}) : super(key: key);
+    required this.route, required this.doctor}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -22,16 +22,17 @@ class DoctorsCard extends StatelessWidget {
             children: [
               SizedBox(
                 width: Dimensions.widthsize*0.33,
-                child: Image.asset("assets/images/jimmy.JPG"),
+                child: //Image.asset('assets/images/jimmy.JPG')
+                Image.network("https://gambo.rickieyngambo.xyz/appointment/appointment${doctor["doctor_profile"]}"),
               ),
               Flexible(child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 15,vertical: 20),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                  Text("Dr Jimmy Nyamawi",style: TextStyle(color: Colors.black,fontWeight:FontWeight.bold),),
+                  Text("Dr ${doctor['doctor_name']}",style: TextStyle(color: Colors.black,fontWeight:FontWeight.bold),),
                 SizedBox(height: 5,),
-                Text("Dental",style: TextStyle(color: Colors.black)),
+                Text("${doctor['category']}",style: TextStyle(color: Colors.black)),
                     const Spacer(),
               Row(
                 children: [
@@ -51,7 +52,7 @@ class DoctorsCard extends StatelessWidget {
           ),
         ),
         onTap: (){
-          Navigator.of(context).pushNamed(route);
+          Navigator.of(context).pushNamed(route,arguments: doctor);
         },
       ),
     );

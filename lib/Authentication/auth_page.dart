@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:sample/Authentication/sign_up.dart';
 
 import '../Dimensions/dimensions.dart';
 import 'login_form.dart';
@@ -13,6 +14,7 @@ class AuthPage extends StatefulWidget {
 }
 
 class _AuthPageState extends State<AuthPage> {
+  bool isSignIn=true;
   @override
   Widget build(BuildContext context) {
     Dimensions().init(context);
@@ -33,13 +35,15 @@ class _AuthPageState extends State<AuthPage> {
                 fontWeight: FontWeight.bold,
               ),),
               Dimensions.spacesmall,
-              Text("Sign in to your account",style: TextStyle(
+              Text(
+                isSignIn
+                ?"Sign in to your account"!:"You can easily SIgnUp and connect to the doctors near you!"!,style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.bold,
               ),),
               Dimensions.spacesmall,
-              LoginPage(),
-              Center(
+             isSignIn?LoginScreen():SignUp(),
+              isSignIn ? Center(
                 child: TextButton(
                   onPressed: (){},
                   child: Text("Forgot Your Password",style: TextStyle(
@@ -48,7 +52,7 @@ class _AuthPageState extends State<AuthPage> {
                     fontWeight: FontWeight.bold,
                   ),),
                 ),
-              ),
+              ):Container(),
               const Spacer(),
               Center(
                 child: Text("Or continue with social account?",style: TextStyle(
@@ -71,16 +75,23 @@ class _AuthPageState extends State<AuthPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text("Dont have an account? ",style: TextStyle(
+                  Text(isSignIn? "Dont have an account?":"Already have an account?",style: TextStyle(
                     color: Colors.grey.shade500,
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
                   ),),
-                  Text("Sign Up.",style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                  ),),
+                  TextButton(
+                    onPressed: (){setState(() {
+                      isSignIn=!isSignIn;
+                    });
+  },
+                    child: Text(
+                      isSignIn? "Sign Up.":"Sign In",style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                    ),),
+                  ),
                 ],
               )
             ],

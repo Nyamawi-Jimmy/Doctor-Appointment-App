@@ -20,6 +20,7 @@ class _DoctorDetailsState extends State<DoctorDetails> {
   bool isFav =false;
   @override
   Widget build(BuildContext context) {
+    final doctor=ModalRoute.of(context)!.settings.arguments as Map;
     return Scaffold(
       appBar:CustomAppbar(
         appTitle: "Doctor Details",
@@ -38,13 +39,15 @@ class _DoctorDetailsState extends State<DoctorDetails> {
           child: Column(
             children: [
               //Circle avatar and  intro
-              AboutDoctor(),
+              AboutDoctor(
+                doctor: doctor,
+              ),
               Padding(padding: EdgeInsets.all(20),
               child: Button(
                 width: double.infinity,
                 title: "Book Appointment",
                 onPressed: () {
-                  Navigator.of(context).pushNamed("booking_page");
+                  Navigator.of(context).pushNamed("booking_page",arguments: {'doctor_id':doctor['doc_id']});
                 },
                 disable: false,
               ),
@@ -59,8 +62,8 @@ class _DoctorDetailsState extends State<DoctorDetails> {
 }
 
 class AboutDoctor extends StatelessWidget {
-  const AboutDoctor({Key? key}) : super(key: key);
-
+  const AboutDoctor({Key? key, required this.doctor}) : super(key: key);
+final Map <dynamic, dynamic>doctor;
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -75,7 +78,7 @@ class AboutDoctor extends StatelessWidget {
             ),
           ),
           Dimensions.spacesmall,
-          Text("Dr Jimmy Nyamawi",style: TextStyle(
+          Text("Dr ${doctor['doctor_name']}",style: TextStyle(
               color: Colors.black,
           fontSize: 20,
             fontWeight: FontWeight.bold
@@ -102,8 +105,10 @@ class AboutDoctor extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
           ),
-      Dimensions.spacesmall,
-          DetailsBody(),
+     Dimensions.spacesmall,
+          DetailsBody(
+            doctor: doctor,
+          ),
         ],
       ),
     );
@@ -111,7 +116,8 @@ class AboutDoctor extends StatelessWidget {
 }
 
 class DetailsBody extends StatelessWidget {
-  const DetailsBody({Key? key}) : super(key: key);
+  const DetailsBody({Key? key, required this.doctor,}) : super(key: key);
+  final Map <dynamic, dynamic>doctor;
 
   @override
   Widget build(BuildContext context) {
@@ -130,7 +136,7 @@ class DetailsBody extends StatelessWidget {
               fontWeight: FontWeight.bold
           ),),
           SizedBox(height: 10,),
-          Text("Dr. Jimmy Nyamawi is a highly experienced dentist who has made a significant impact in the field of dentistry. With years of practice under his belt, Dr. Nyamawi has gained a reputation as a knowledgeable and skilled practitioner who is dedicated to providing his patients with the best possible dental care.",
+          Text("Dr ${doctor['doctor_name']}is a highly experienced dentist who has made a significant impact in the field of dentistry. With years of practice under his belt, Dr. Nyamawi has gained a reputation as a knowledgeable and skilled practitioner who is dedicated to providing his patients with the best possible dental care.",
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w400,
