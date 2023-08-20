@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:provider/provider.dart';
+import 'package:sample/models/auth_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../Dimensions/dimensions.dart';
 import '../Providers/dio_prov.dart';
@@ -18,6 +20,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
     Map<String, dynamic>user={};
+    List<dynamic> favList=[];
     Map<String, dynamic>doctor={};
   List<Map<String, dynamic>> medCart = [
     {"icon": FontAwesomeIcons.userDoctor, "category": "General"},
@@ -28,7 +31,7 @@ class _HomeScreenState extends State<HomeScreen> {
     {"icon": FontAwesomeIcons.teeth, "category": "Dentist"}
   ];
 
-  Future <void> getData() async{
+   /* Future <void> getData() async{
 
     //Get token from sharedp references
     final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -58,11 +61,18 @@ class _HomeScreenState extends State<HomeScreen> {
     void initState(){
       getData();
       super.initState();
-    }
+    }*/
 
   @override
   Widget build(BuildContext context) {
     Dimensions().init(context);
+    user=Provider.of<AuthModel>(context,listen: false).getUser;
+    doctor=Provider.of<AuthModel>(context,listen: false).getAppointment;
+    favList=Provider.of<AuthModel>(context,listen: false).getFav;
+
+    print('user data is : $user');
+    print('fav list data is : $favList');
+
     return Scaffold(
       body: user.isEmpty?
           Center(
@@ -178,8 +188,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       children: List.generate(
                         user['doctor'].length,
                         (index) => DoctorsCard(
-                          route: 'doc_details',
+                          //route: 'doc_details',
                           doctor:user['doctor'][index],
+                          isFav:favList.contains(user['doctor'][index]['doc_id'])? true:false
                         ),
                       ),
                     )

@@ -1,6 +1,10 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:rating_dialog/rating_dialog.dart';
+import 'package:sample/Providers/dio_prov.dart';
+import 'package:sample/main.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Dimensions/dimensions.dart';
 
@@ -33,8 +37,9 @@ class _AppointmentCardState extends State<AppointmentCard> {
                 children: [
                   CircleAvatar(
                     radius: 30,
-                    backgroundImage: NetworkImage(
-                        "https://gambo.rickieyngambo.xyz/appointment/appointment${widget.doctor["doctor_profile"]}"),
+                    backgroundImage:/* NetworkImage(
+                        "https://gambo.rickieyngambo.xyz/appointment/api/appointment${widget.doctor["doctor_profile"]}"),*/
+                    AssetImage('assets/images/jimmy.JPG')
                   ),
                     SizedBox(width: 15,),
                     Column(
@@ -69,7 +74,35 @@ class _AppointmentCardState extends State<AppointmentCard> {
                           style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.green
                           ),
-                          onPressed: (){},
+                          onPressed: (){
+                            showDialog(context: context, builder: (context){
+                              return RatingDialog(
+                                initialRating: 1.0,
+                                  title: const Text('Rate the doctor',textAlign: TextAlign.center,
+                                    style:TextStyle(fontSize: 20,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  message: Text('Please help us rate our doctor',textAlign: TextAlign.center,
+                                    style:TextStyle(fontSize: 15,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  image: const FlutterLogo(size: 100,),
+                                  submitButtonText: 'Submit',
+                                  commentHint: "Your Reviews",
+                                  onSubmitted: (response)async{
+                                  final SharedPreferences prefs=await SharedPreferences.getInstance();
+                                  final token=prefs.getString('token');
+                                  final rating=await DioProvider().storeReviews(response.comment,
+                                      response.rating,
+                                      widget.doctor['appointments']['id'],
+                                      widget.doctor['doc_id'], token!);
+
+                                  if(rating==200 && rating!=''){
+                                    MyApp.navigatorkey.currentState!.pushNamed("main");
+                                  }
+                                  });
+                            });
+                          },
                           child: Text("Completed",style: TextStyle(color: Colors.white),))),
                 ],
               )

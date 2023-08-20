@@ -91,15 +91,17 @@ class _SignUpState extends State<SignUp> {
                       _nameController.text,
                     _emailController.text,
                     _passwordController.text,);
-                  //print(userRegistration);
+                  print(userRegistration);
                   if (!(userRegistration is DioError)){
                     final token=await DioProvider().login(_emailController.text, _passwordController.text,);
                     if(token){
-                      auth.loginSuccess();
+                      print(token);
+                      auth.loginSuccess({},{});
                       MyApp.navigatorkey.currentState!.pushNamed('/');
                     }
                   }else{
-                    print("register not succesfull");
+                    print("Register not succesfull");
+
                   }
 
                 },

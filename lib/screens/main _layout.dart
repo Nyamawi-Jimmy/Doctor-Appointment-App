@@ -2,6 +2,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:sample/screens/fav_page.dart';
+import 'package:sample/screens/profile_page.dart';
 
 import 'appointment_screen.dart';
 import 'home_screen.dart';
@@ -29,7 +31,9 @@ class _MainLayoutState extends State<MainLayout> {
           }),
           children: [
             HomeScreen(),
+            FavouritePage(),
             AppointmentPage(),
+            ProfilePage()
 
           ],
         ),
@@ -48,9 +52,15 @@ class _MainLayoutState extends State<MainLayout> {
       BottomNavigationBarItem(
     icon:FaIcon(FontAwesomeIcons.houseChimneyMedical),
     label: "Home"),
+      BottomNavigationBarItem(
+          icon:FaIcon(FontAwesomeIcons.solidHeart),
+          label: "Favourite"),
     BottomNavigationBarItem(
     icon:FaIcon(FontAwesomeIcons.solidCalendarCheck),
     label: "Appointments"),
+      BottomNavigationBarItem(
+          icon:FaIcon(FontAwesomeIcons.solidUser),
+          label: "Profile"),
     ],
     ),
     );

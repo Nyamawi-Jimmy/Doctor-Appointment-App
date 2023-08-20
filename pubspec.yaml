@@ -44,6 +44,7 @@ dependencies:
   provider: ^6.0.5
   change_notifier: ^0.24.0
   shared_preferences: ^2.1.0
+  rating_dialog: ^2.0.4
 
 dev_dependencies:
   flutter_test:

@@ -6,6 +6,7 @@ import 'package:sample/screens/booking_page.dart';
 import 'package:sample/screens/doctor_details.dart';
 import 'package:sample/screens/home_screen.dart';
 import 'package:sample/screens/main%20_layout.dart';
+import 'package:sample/screens/profile_page.dart';
 import 'package:sample/screens/success_booked.dart';
 
 import 'Authentication/auth_page.dart';
@@ -61,7 +62,7 @@ class MyApp extends StatelessWidget {
           //main page after login
           "main":(context)=>const MainLayout(),
           //"home":(context)=>HomeScreen(),
-          "doc_details":(context)=>const DoctorDetails(),
+          //"doc_details":(context)=>const DoctorDetails(),
           "booking_page":(context)=>const BookingPage(),
           "appointment_booked":(context)=>const AppointmentBooked(),
 

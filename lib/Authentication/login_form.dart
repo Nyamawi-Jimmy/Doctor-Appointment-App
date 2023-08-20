@@ -4,8 +4,10 @@ import 'package:provider/provider.dart';
 import 'package:sample/Providers/dio_prov.dart';
 import 'package:sample/main.dart';
 import 'package:sample/models/auth_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../Dimensions/dimensions.dart';
 import '../Widgets/button.dart';
+import 'dart:convert';
 import '../screens/home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -16,6 +18,7 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
+
   final _formKey = GlobalKey<FormState>();
   bool _isObscure=true;
   bool _isLoading = false;
@@ -81,8 +84,33 @@ class _LoginScreenState extends State<LoginScreen> {
                        final token=await DioProvider().login(_emailController.text, _passwordController.text,);
                        print(token);
                         if(token){
-                          auth.loginSuccess();
-                          MyApp.navigatorkey.currentState!.pushNamed('main');
+                           auth.loginSuccess({},{});
+                           //grab user data
+
+                           final SharedPreferences prefs = await SharedPreferences.getInstance();
+                           final tokenValue=prefs.getString('token')??'';
+
+                           if(tokenValue.isNotEmpty && tokenValue !=''){
+                             final response = await DioProvider().getUser(tokenValue);
+                             if(response!=null){
+                               setState(() {
+                                 Map <String,dynamic> appointment={};
+                                 final user = json.decode(response);
+                                 //print(user);
+                                 //check todays appointment if there is any return for today
+                                 for(var doctorData in user ['doctor']){
+                                   //if there is any pass for today and then the doctor info
+                                   if(doctorData['appointments']!=null){
+                                     appointment=doctorData;
+                                     print(appointment);
+                                   }
+                                 }
+                                 auth.loginSuccess(user,appointment);
+                                 MyApp.navigatorkey.currentState!.pushNamed('main');
+                               });
+                             }
+                           }
+
                         }
                      },
                      title: 'Sign In',
